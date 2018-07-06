@@ -34,24 +34,25 @@ def itkrm(data,K,S,maxitr,startD=np.array([1])):
     if startD.all()==1:
         D_init = np.random.randn(M, K)
     else:
-        D_init = startD
+        D_init=startD
     Y = data
-    I_D = np.zeros((S,N), dtype=np.int32)
-    
+    I_D=np.zeros((S,N), dtype=np.int32)
+
     #Algorithm
-    D_old = D_init
+    D_old=D_init
     for i in range(maxitr):
-        start_time = N_timer.cont_timer(0,0)
+        start_time=N_timer.cont_timer(0,0)
         N_timer.Timer(i,maxitr)
         for n in range(N):
-            I_D[:,n] = max_atoms(D_old,Y[:,n],S)
-        D_new = np.zeros((M,K))
-        for n in range(N):
-            matproj = np.repeat(np.array([ proj(D_old[:,I_D[:,n]])@Y[:,n] ]).T, S, axis=1)
-            vecproj = D_old[:,I_D[:,n]] @ np.diag(np.diag(D_old[:,I_D[:,n]].T @ D_old[:,I_D[:,n]] )**-1*(D_old[:,I_D[:,n]].T@Y[:,n]))
-            signer = np.sign(D_old[:,I_D[:,n]].T@Y[:,n])
-            D_new[:,I_D[:,n]] = D_new[:,I_D[:,n]] + (np.repeat(np.array([Y[:,n]]).T, S, axis=1) - matproj + vecproj)*signer
-   
+            I_D[:,n]=max_atoms(D_old,Y[:,n],S)
+        D_new=np.zeros((M,K))
+        for k in range(K):
+            for n in range(N):
+                matproj=proj(D_old[:,I_D[:,n]])@Y[:,n]
+                vecproj=proj(D_old[:,k])@Y[:,n]
+                signer=np.sign(D_old[:,k].T@Y[:,n])
+                indicator=np.any(I_D[:,n]==k)
+                D_new[:,k]=D_new[:,k]+(Y[:,n]-matproj+vecproj)*signer*indicator
     #Replace zero filled atoms
         scale = np.sum(D_new*D_new, axis=0)
         iszero = np.where(scale < 0.00001)[0]
@@ -60,7 +61,8 @@ def itkrm(data,K,S,maxitr,startD=np.array([1])):
 
         D_new = normalize_mat_col(D_new)
         D_old = 1*D_new
-
+        
     return D_old
 
 if __name__ == "__main__":
+    pass

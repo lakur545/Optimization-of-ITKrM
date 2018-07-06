@@ -37,7 +37,7 @@ def itkrm(data,K,S,maxitr,startD=np.array([1])):
         D_init = startD
     Y = data
     I_D = np.zeros((S,N), dtype=np.int32)
-    
+  
     #Algorithm
     D_old = D_init
     for i in range(maxitr):
@@ -46,14 +46,12 @@ def itkrm(data,K,S,maxitr,startD=np.array([1])):
         for n in range(N):
             I_D[:,n] = max_atoms(D_old,Y[:,n],S)
         D_new = np.zeros((M,K))
-        DtD = D_old.T@D_old
         for n in range(N):
-            DtY = D_old[:,I_D[:,n]].T @ Y[:,n]
-            matproj = np.repeat(np.array([ D_old[:,I_D[:,n]] @ np.linalg.inv(DtD[I_D[:,n,None], I_D[:,n]]) @ DtY ]).T, S, axis=1)
-            vecproj = D_old[:,I_D[:,n]] @ np.diag(np.diag( DtD[I_D[:,n,None], I_D[:,n]] )**-1*( DtY ))
-            signer = np.sign( DtY )
-            D_new[:,I_D[:,n]] = D_new[:,I_D[:,n]] + (np.repeat(Y[:,n,None], S, axis=1) - matproj + vecproj)*signer
-
+            matproj = proj(D_old[:,I_D[:,n]])@Y[:,n]
+            for k in I_D[:,n]:
+                vecproj = proj(D_old[:,k])@Y[:,n]
+                signer = np.sign(D_old[:,k].T@Y[:,n])
+                D_new[:,k] = D_new[:,k]+(Y[:,n]-matproj+vecproj)*signer
     #Replace zero filled atoms
         scale = np.sum(D_new*D_new, axis=0)
         iszero = np.where(scale < 0.00001)[0]
@@ -66,4 +64,4 @@ def itkrm(data,K,S,maxitr,startD=np.array([1])):
     return D_old
 
 if __name__ == "__main__":
-
+    pass

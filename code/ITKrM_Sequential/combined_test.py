@@ -1,17 +1,22 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.measure import compare_ssim
+import ImportImages
+import LoadFromDataBatch
+import OMP_fast
+from time import time
 
 import KarinSchnassCopy as KSC
-import ImportImages
-import OMP_fast
-import LoadFromDataBatch
+import Naive_ITKrM as naive # VERY SLOW
 from sequential_optimization.Iteration1 import ITKrM_optimization1 as seq_opt_1
 from sequential_optimization.Iteration2 import ITKrM_optimization2 as seq_opt_2
 from sequential_optimization.Iteration3 import ITKrM_optimization3 as seq_opt_3
-from time import time
 
-## Set the number of threads for numpy for true sequential performance
+# when making the dictionary simply choose one of the versions
+# KSC.itkrm, naive.itkrm, seq_opt_1.itkrm etc.
+
+
+## Set the number of threads that numpy may use for true sequential performance
 
 #import mkl
 #mkl.set_num_threads(4)
@@ -60,7 +65,7 @@ pic_number = 0 # What picture to show from the test batch
 # training dictionary
 print("ITKrM")
 t0=time()
-dictionary = KSC.itkrm(smallSet,K,S,maxit)
+dictionary = seq_opt_1.itkrm(smallSet,K,S,maxit)
 t1=time()
 #
 
