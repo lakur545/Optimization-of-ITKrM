@@ -1,0 +1,49 @@
+ITKrM
+Iteration 1 of 20Iteration 2 of 20Estimate until done: 0 minutes 19 seconds
+Iteration 3 of 20Iteration 4 of 20Iteration 5 of 20Iteration 6 of 20Iteration 7 of 20Iteration 8 of 20Iteration 9 of 20Iteration 10 of 20Iteration 11 of 20Iteration 12 of 20Iteration 13 of 20Iteration 14 of 20Iteration 15 of 20Iteration 16 of 20Iteration 17 of 20Iteration 18 of 20Iteration 19 of 20Iteration 20 of 20ITKrM took: 20.121170043945312 seconds
+Filename: /home/amalie/Documents/GIT/DLPC/Project Code/A/ITKrM_seq_3.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    32  119.059 MiB  119.059 MiB   @profile
+    33                             def itkrm(data,K,S,maxitr,startD=np.array([1])):
+    34  119.059 MiB    0.000 MiB       M, N = data.shape
+    35  119.059 MiB    0.000 MiB       if startD.all()==1:
+    36  119.059 MiB    0.000 MiB           D_init = np.random.randn(M, K)
+    37                                 else:
+    38                                     D_init = startD
+    39  119.059 MiB    0.000 MiB       Y = data
+    40  119.059 MiB    0.000 MiB       I_D = np.zeros((S,N), dtype=np.int32)
+    41                             #    N_timer.log(0,log_s='20 data test, 14/03',open_file=1)
+    42                                 #Algorithm
+    43  119.059 MiB    0.000 MiB       D_old = D_init
+    44  132.023 MiB    0.000 MiB       for i in range(maxitr):
+    45  132.023 MiB    0.000 MiB           start_time = N_timer.cont_timer(0,0)
+    46  132.023 MiB    0.000 MiB           N_timer.Timer(i,maxitr)
+    47  132.023 MiB    0.000 MiB           for n in range(N):
+    48  132.023 MiB    9.637 MiB               I_D[:,n] = max_atoms(D_old,Y[:,n],S)
+    49  132.023 MiB    0.000 MiB           D_new = np.zeros((M,K))
+    50  132.023 MiB    1.047 MiB           DtD = D_old.T@D_old
+    51  132.023 MiB    0.000 MiB           for n in range(N):
+    52  132.023 MiB    0.000 MiB               DtY = D_old[:,I_D[:,n]].T @ Y[:,n]
+    53  132.023 MiB    2.281 MiB               matproj = np.repeat(np.array([ D_old[:,I_D[:,n]] @ np.linalg.inv(DtD[I_D[:,n,None], I_D[:,n]]) @ DtY ]).T, S, axis=1)
+    54  132.023 MiB    0.000 MiB               vecproj = D_old[:,I_D[:,n]] @ np.diag(np.diag( DtD[I_D[:,n,None], I_D[:,n]] )**-1*( DtY ))
+    55  132.023 MiB    0.000 MiB               signer = np.sign( DtY )
+    56  132.023 MiB    0.000 MiB               D_new[:,I_D[:,n]] = D_new[:,I_D[:,n]] + (np.repeat(Y[:,n,None], S, axis=1) - matproj + vecproj)*signer
+    57                             #            for k in I_D[:,n]:
+    58                             #                vecproj = D_old[:,k] * (D_old[:,k].T@D_old[:,k])**-1 * (D_old[:,k].T@Y[:,n])
+    59                             #                signer = np.sign(D_old[:,I_D[:,n]].T@Y[:,n])
+    60                             #                D_new[:,k] = D_new[:,k]+(Y[:,n]-matproj+vecproj[:,m])*signer
+    61                                 #hugget fra Karin
+    62  132.023 MiB    0.000 MiB           scale = np.sum(D_new*D_new, axis=0)
+    63  132.023 MiB    0.000 MiB           iszero = np.where(scale < 0.00001)[0]
+    64  132.023 MiB    0.000 MiB           D_new[:,iszero] = np.random.randn(M, len(iszero))
+    65                                 #end hugget
+    66                             
+    67  132.023 MiB    0.000 MiB           D_new = normalize_mat_col(D_new)
+    68  132.023 MiB    0.000 MiB           D_old = 1*D_new
+    69                             #        N_timer.log(N_timer.cont_timer(start_time,1))
+    70                             #    N_timer.log("end",open_file=-1)
+    71  132.023 MiB    0.000 MiB       return D_old
+
+
