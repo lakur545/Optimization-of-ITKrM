@@ -1,0 +1,45 @@
+Line_profiler
+
+>>> conda install -c anaconda line_profiler
+
+to use:
+
+1. set decorator at the function to test
+
+@profile
+def funtion_to_test()
+	return
+	
+2. In terminal with python avaiable run
+
+>>> kernprof -l file_to_test.py
+
+3. To see the information run
+
+>>> python -m line_profiler file_to_test.py.lprof
+
+4. To save as Human readable copy the text from terminal into a document or run
+
+>>> python -m line_profiler file_to_test.py.lprof > file_name
+
+
+
+Memory_profiler
+
+>>> conda install memory_profiler
+
+to use:
+
+1. set decorator at the function to test
+
+@profile
+def funtion_to_test()
+	return
+	
+2. In terminal with python avaiable run
+
+>>> python -m memory_profiler file_to_test.py
+
+3. To save the information to a file run
+
+>>> python -m memory_profiler file_to_test.py > file_name.txt

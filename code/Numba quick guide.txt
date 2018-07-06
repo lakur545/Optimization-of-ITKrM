@@ -1,0 +1,18 @@
+The quickest way to numba-fy somthing is as follows
+
+
+from numba import jit
+
+@jit
+def some_function(x,y,z):
+	stuf
+	stuf
+	stuf
+	return some stuf
+
+
+
+
+Remember to do some testing of the time it takes to run, as numba is not guranteed to be faster.
+
+Also, first time numba runs it has some overhead, as it while try an compiled the optimized code in the first run of a given function

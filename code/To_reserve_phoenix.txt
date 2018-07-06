@@ -1,0 +1,3 @@
+srun --time=H:MM:SS --partition=phoenix --nodes=1 --exclude=phoenix[2] --pty /bin/bash -l
+
+insert the needed time

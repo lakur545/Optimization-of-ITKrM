@@ -1,0 +1,52 @@
+Timer unit: 2.77277e-07 s
+
+Total time: 28.5959 s
+File: gpu_itkrm.py
+Function: gpu_itkrm at line 20
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    20                                           @profile
+    21                                           def gpu_itkrm(data, K, S, maxit):
+    22         1         15.0     15.0      0.0      M, N = data.shape
+    23         1       5398.0   5398.0      0.0      D_init = np.random.randn(M, K)
+    24       201        723.0      3.6      0.0      for i in range(K):
+    25       200      16711.0     83.6      0.0          D_init[:,i] = D_init[:,i] / np.linalg.norm(D_init[:,i], 2)
+    26         1          3.0      3.0      0.0      Y = data
+    27         1        904.0    904.0      0.0      I_D = np.zeros((S, N), dtype=np.int32)
+    28         1          3.0      3.0      0.0      D = D_init
+    29         1          4.0      4.0      0.0      TpB = 32    # ThreadsPerBlock
+    30         1         17.0     17.0      0.0      BpG = math.ceil(N/32)     # BlocksPerGrid
+    31        21         85.0      4.0      0.0      for t in range(maxit):
+    32        20       9887.0    494.4      0.0          N_timer.Timer(t, maxit)
+    33     80020     299309.0      3.7      0.3          for n in range(N):
+    34     80000    7672312.0     95.9      7.4              I_D[:,n] = np.argpartition(np.abs(D.T@Y[:,n]), -S)[-S:]
+    35        20       3971.0    198.6      0.0          D_new = np.zeros((M, K))
+    36        20      42767.0   2138.3      0.0          DtD = D.T@D
+    37        20      11425.0    571.2      0.0          d_D = D.reshape(-1)*1
+    38        20       2021.0    101.0      0.0          d_DtD = DtD.reshape(-1)*1
+    39        20       9618.0    480.9      0.0          d_I_D = I_D.reshape(-1)*1
+    40        20       9462.0    473.1      0.0          d_DtY = np.zeros(N*S)
+    41        20     301445.0  15072.2      0.3          d_Y = Y.reshape(-1)*1
+    42        20    2378558.0 118927.9      2.3          vecproj = np.zeros(N*M*S)
+    43        20     394397.0  19719.8      0.4          L = np.zeros(N*S*S)
+    44        20     385793.0  19289.7      0.4          U = np.zeros(N*S*S)
+    45        20      12061.0    603.0      0.0          z = np.zeros(N*S)
+    46        20      11785.0    589.2      0.0          x = np.zeros(N*S)
+    47        20      64024.0   3201.2      0.1          matproj = np.zeros(M*N)
+    48        20   40710155.0 2035507.8     39.5          D_kernel2[TpB, BpG](M, N, K, S, d_D, d_DtD, d_I_D, d_DtY, d_Y, vecproj, L, U, z, x, matproj)
+    49     80020     355044.0      4.4      0.3          for n in range(N):
+    50     80000    4084230.0     51.1      4.0              DtY = D[:,I_D[:,n]].T @ Y[:,n]
+    51     80000     719691.0      9.0      0.7              signer = np.sign( DtY )
+    52     80000   45319192.0    566.5     43.9              D_new[:,I_D[:,n]] = D_new[:,I_D[:,n]] + (np.repeat(Y[:,n,None], S, axis=1) - np.repeat(matproj.reshape(N, M)[n,:,None], S, axis=1) + vecproj.reshape(N,M,S)[n,:,:])*signer
+    53                                                   
+    54        20       6322.0    316.1      0.0          scale = np.sum(D_new*D_new, axis=0)
+    55        20        815.0     40.8      0.0          iszero = np.where(scale < 0.00001)[0]
+    56        20       3453.0    172.7      0.0          D_new[:,iszero] = np.random.randn(M, len(iszero))
+    57                                           
+    58        20     297669.0  14883.5      0.3          D_new = normalize_mat_col(D_new)
+    59        20       1956.0     97.8      0.0          D = 1*D_new
+    60                                           #        N_timer.log(N_timer.cont_timer(start_time,1))
+    61                                           #    N_timer.log("end",open_file=-1)
+    62         1          3.0      3.0      0.0      return D
+

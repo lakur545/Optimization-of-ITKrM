@@ -1,0 +1,60 @@
+ITKrM
+Iteration 1 of 1
+OMP
+Iteration 1 of 40Iteration 2 of 40Estimate until done: 0 minutes 0 seconds
+Iteration 3 of 40Iteration 4 of 40Iteration 5 of 40Iteration 6 of 40Iteration 7 of 40Iteration 8 of 40Iteration 9 of 40Iteration 10 of 40Iteration 11 of 40Iteration 12 of 40Iteration 13 of 40Iteration 14 of 40Iteration 15 of 40Iteration 16 of 40Iteration 17 of 40Iteration 18 of 40Iteration 19 of 40Iteration 20 of 40Iteration 21 of 40Iteration 22 of 40Iteration 23 of 40Iteration 24 of 40Iteration 25 of 40Iteration 26 of 40Iteration 27 of 40Iteration 28 of 40Iteration 29 of 40Iteration 30 of 40Iteration 31 of 40Iteration 32 of 40Iteration 33 of 40Iteration 34 of 40Iteration 35 of 40Iteration 36 of 40Iteration 37 of 40Iteration 38 of 40Iteration 39 of 40Iteration 40 of 40
+sparseness level x:
+0 : 4
+1 : 4
+2 : 4
+3 : 4
+Average: 4.0
+ssim: 0.717663133875
+General pixel error (p-value): 0.2901689652218212
+ITKrM took: 0.2054741382598877 seconds
+Filename: C:\Users\sebas\Desktop\DLPC\code\first_implementation\sequential_optimization_line_profiler\Iteration3\Niels_ITKrM_optimization.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    32  131.359 MiB  131.359 MiB   @profile
+    33                             def itkrm(data,K,S,maxitr,startD=np.array([1])):
+    34  131.359 MiB    0.000 MiB       M, N = data.shape
+    35  131.363 MiB    0.004 MiB       if startD.all()==1:
+    36  131.762 MiB    0.398 MiB           D_init = np.random.randn(M, K)
+    37                                 else:
+    38                                     D_init = startD
+    39  131.762 MiB    0.000 MiB       Y = data
+    40  131.762 MiB    0.000 MiB       I_D = np.zeros((S,N), dtype=np.int32)
+    41                             #    N_timer.log(0,log_s='20 data test, 14/03',open_file=1)
+    42                                 #Algorithm
+    43  131.762 MiB    0.000 MiB       D_old = D_init
+    44  135.215 MiB    0.000 MiB       for i in range(maxitr):
+    45  131.762 MiB    0.000 MiB           start_time = N_timer.cont_timer(0,0)
+    46  131.762 MiB    0.000 MiB           N_timer.Timer(i,maxitr)
+    47  132.672 MiB    0.000 MiB           for n in range(N):
+    48  132.672 MiB    0.910 MiB               I_D[:,n] = max_atoms(D_old,Y[:,n],S)
+    49  133.062 MiB    0.391 MiB           D_new = np.zeros((M,K))
+    50  133.961 MiB    0.898 MiB           DtD = D_old.T@D_old
+    51  134.383 MiB    0.000 MiB           for n in range(N):
+    52  134.383 MiB    0.000 MiB               DtY = D_old[:,I_D[:,n]].T @ Y[:,n]
+    53  134.383 MiB    0.238 MiB               matproj = np.repeat(np.array([ D_old[:,I_D[:,n]] @ np.linalg.inv(DtD[I_D[:,n,None], I_D[:,n]]) @ DtY ]).T, S, axis=1)
+    54  134.383 MiB    0.008 MiB               vecproj = D_old[:,I_D[:,n]] @ np.diag(np.diag( DtD[I_D[:,n,None], I_D[:,n]] )**-1*( DtY ))
+    55  134.383 MiB    0.004 MiB               signer = np.sign( DtY )
+    56  134.383 MiB    0.172 MiB               D_new[:,I_D[:,n]] = D_new[:,I_D[:,n]] + (np.repeat(Y[:,n,None], S, axis=1) - matproj + vecproj)*signer
+    57                             #            for k in I_D[:,n]:
+    58                             #                vecproj = D_old[:,k] * (D_old[:,k].T@D_old[:,k])**-1 * (D_old[:,k].T@Y[:,n])
+    59                             #                signer = np.sign(D_old[:,I_D[:,n]].T@Y[:,n])
+    60                             #                D_new[:,k] = D_new[:,k]+(Y[:,n]-matproj+vecproj[:,m])*signer
+    61                                 #hugget fra Karin
+    62  134.777 MiB    0.395 MiB           scale = np.sum(D_new*D_new, axis=0)
+    63  134.781 MiB    0.004 MiB           iszero = np.where(scale < 0.00001)[0]
+    64  134.781 MiB    0.000 MiB           D_new[:,iszero] = np.random.randn(M, len(iszero))
+    65                                 #end hugget
+    66                             
+    67  135.215 MiB    0.434 MiB           D_new = normalize_mat_col(D_new)
+    68  135.215 MiB    0.000 MiB           D_old = 1*D_new
+    69                             #        N_timer.log(N_timer.cont_timer(start_time,1))
+    70                             #    N_timer.log("end",open_file=-1)
+    71  135.215 MiB    0.000 MiB       return D_old
+
+

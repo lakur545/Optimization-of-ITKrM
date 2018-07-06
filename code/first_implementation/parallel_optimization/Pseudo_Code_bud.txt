@@ -1,0 +1,20 @@
+Main process
+	Load data
+	Generate start D
+	D_old = D_init					(Shared, read only for children)
+	
+	For t in maxitr
+	
+		Pooljobs for n in N			(feed only one y_n to each job)
+			
+			generate D_new			(Could be expensive space wise as we get n*size(D_new) space needed)
+			matproj
+			vecproj
+			signer
+			D_new = math on stuff
+		
+		Sum data from all process
+		Normalize D_new
+		D_old = D_new
+	
+	return D_old

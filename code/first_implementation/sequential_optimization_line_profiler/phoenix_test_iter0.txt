@@ -1,0 +1,87 @@
+Timer unit: 1e-06 s
+
+Total time: 2623.16 s
+File: /user/nmunth14/bare_needed_4_itkrm/Niels_ITKrM.py
+Function: itkrm at line 32
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    32                                           @profile
+    33                                           def itkrm(data,K,S,maxitr,startD=np.array([1])):
+    34         1            5      5.0      0.0      M, N = data.shape
+    35         1           43     43.0      0.0      if startD.all()==1:
+    36         1         3307   3307.0      0.0          D_init = np.random.randn(M, K)
+    37                                               else:
+    38                                                   D_init=startD
+    39         1            1      1.0      0.0      Y = data
+    40         1           17     17.0      0.0      I_D=np.zeros((S,N), dtype=np.int32)
+    41                                           #    N_timer.log(0,log_s='20 data test, 14/03',open_file=1)
+    42                                               #Algorithm
+    43         1            2      2.0      0.0      D_old=D_init
+    44        21           38      1.8      0.0      for i in range(maxitr):
+    45        20          441     22.1      0.0          start_time=N_timer.cont_timer(0,0)
+    46        20          933     46.6      0.0          N_timer.Timer(i,maxitr)
+    47      8020        12748      1.6      0.0          for n in range(N):
+    48      8000       284261     35.5      0.0              I_D[:,n]=max_atoms(D_old,Y[:,n],S)
+    49        20          681     34.0      0.0          D_new=np.zeros((M,K))
+    50      4020         4264      1.1      0.0          for k in range(K):
+    51   1604000      2701154      1.7      0.1              for n in range(N):
+    52   1600000   2136411164   1335.3     81.4                  matproj=proj(D_old[:,I_D[:,n]])@Y[:,n]
+    53   1600000    384668443    240.4     14.7                  vecproj=proj(D_old[:,k])@Y[:,n]
+    54   1600000     19813538     12.4      0.8                  signer=np.sign(D_old[:,k].T@Y[:,n])
+    55   1600000     38161970     23.9      1.5                  indicator=np.any(I_D[:,n]==k)
+    56   1600000     40940790     25.6      1.6                  D_new[:,k]=D_new[:,k]+(Y[:,n]-matproj+vecproj)*signer*indicator
+    57                                               #hugget fra Karin
+    58        20         3304    165.2      0.0          scale = np.sum(D_new*D_new, axis=0)
+    59        20          403     20.1      0.0          iszero = np.where(scale < 0.00001)[0]
+    60        20         7691    384.6      0.0          D_new[:,iszero] = np.random.randn(M, len(iszero))
+    61                                               #end hugget
+    62                                           
+    63        20       142313   7115.6      0.0          D_new = normalize_mat_col(D_new)
+    64        20         1084     54.2      0.0          D_old = 1*D_new
+    65                                           #        N_timer.log(N_timer.cont_timer(start_time,1))
+    66                                           #    N_timer.log("end",open_file=-1)
+    67         1            1      1.0      0.0      return D_old
+
+Total time: 0 s
+File: /user/nmunth14/bare_needed_4_itkrm/sequential_optimization_line_profiler/Iteration1/Niels_ITKrM_optimization.py
+Function: itkrm at line 32
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    32                                           @profile
+    33                                           def itkrm(data,K,S,maxitr,startD=np.array([1])):
+    34                                               M, N = data.shape
+    35                                               if startD.all()==1:
+    36                                                   D_init = np.random.randn(M, K)
+    37                                               else:
+    38                                                   D_init = startD
+    39                                               Y = data
+    40                                               I_D = np.zeros((S,N), dtype=np.int32)
+    41                                           #    N_timer.log(0,log_s='20 data test, 14/03',open_file=1)
+    42                                               #Algorithm
+    43                                               D_old = D_init
+    44                                               for i in range(maxitr):
+    45                                                   start_time = N_timer.cont_timer(0,0)
+    46                                                   N_timer.Timer(i,maxitr)
+    47                                                   for n in range(N):
+    48                                                       I_D[:,n] = max_atoms(D_old,Y[:,n],S)
+    49                                                   D_new = np.zeros((M,K))
+    50                                                   for n in range(N):
+    51                                                       matproj = proj(D_old[:,I_D[:,n]])@Y[:,n]
+    52                                                       for k in I_D[:,n]:
+    53                                                           vecproj = proj(D_old[:,k])@Y[:,n]
+    54                                                           signer = np.sign(D_old[:,k].T@Y[:,n])
+    55                                                           D_new[:,k] = D_new[:,k]+(Y[:,n]-matproj+vecproj)*signer
+    56                                               #hugget fra Karin
+    57                                                   scale = np.sum(D_new*D_new, axis=0)
+    58                                                   iszero = np.where(scale < 0.00001)[0]
+    59                                                   D_new[:,iszero] = np.random.randn(M, len(iszero))
+    60                                               #end hugget
+    61                                           
+    62                                                   D_new = normalize_mat_col(D_new)
+    63                                                   D_old = 1*D_new
+    64                                           #        N_timer.log(N_timer.cont_timer(start_time,1))
+    65                                           #    N_timer.log("end",open_file=-1)
+    66                                               return D_old
+

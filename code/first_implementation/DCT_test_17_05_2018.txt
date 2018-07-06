@@ -1,0 +1,8 @@
+OMP took: 0.6204056739807129 seconds
+Total ITKrM ssim: 0.8984879557809706
+ITKrM non-zero entries used: 100
+
+
+DCT took: 0.003299713134765625 seconds
+Total DCT ssim: 0.7363479592084958
+DCT non-zero entries used: 100

@@ -1,0 +1,43 @@
+to get the environment
+$ cp -R nmunth14/.conda/envs $username$/.conda/
+$ cp -R nmunth14/.conda/environments.txt $username$/.conda/
+
+remember to envoke $ anaconda-5.1.0-py36-cuda
+before calling $ source activate GR871
+
+for quick test purpose
+$ cp -R nmunth14/GPU_job_test.slurm $username$/GPU_job_test.slurm
+$ cp -R nmunth14/numba_put_to_use.py $username$/numba_put_to_use.py
+
+also here remeber to envoke $ anaconda-5.1.0-py36-cuda
+before calling $ sbatch GPU_job_test.slurm
+
+The basic slurm is:
+#!/bin/bash
+#SBATCH --partition=phoenix
+
+#SBATCH --nodelist=phoenix1
+
+#SBATCH --job-name=PY_test
+
+#SBATCH --time=1:10:00
+
+
+
+anaconda-5.1.0-py36-cuda
+
+
+
+source activate GR871
+
+
+
+export CUDA_PATH=/usr/local/cuda-7.5
+
+export LD_LIBRARY_PATH=$CUDA_PATH/lib64:$LD_LIBRARY_PATH
+
+
+python py_to_run.py
+
+
+exit $?

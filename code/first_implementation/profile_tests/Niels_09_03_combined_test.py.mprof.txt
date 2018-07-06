@@ -1,0 +1,40 @@
+Filename: C:\Users\Niels\Documents\GitHub\DLPC\code\first_implementation\Niels_ITKrM.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    33  109.219 MiB  109.219 MiB   @profile
+    34                             def itkrm(data,K,S,maxitr,startD=np.array([1])):
+    35                             
+    36  109.219 MiB    0.000 MiB       M, N = data.shape
+    37  109.223 MiB    0.004 MiB       if startD.all()==1:
+    38  109.430 MiB    0.207 MiB           D_init = np.random.randn(M, K)
+    39                                 else:
+    40                                     D_init=startD
+    41  109.430 MiB    0.000 MiB       Y = data
+    42  109.434 MiB    0.004 MiB       I_D=np.zeros((S,N), dtype=np.int32)
+    43                             
+    44                                 #Algorithm
+    45  109.434 MiB    0.000 MiB       D_old=D_init
+    46  114.402 MiB   -3.789 MiB       for i in range(maxitr):
+    47  114.402 MiB   -3.555 MiB           N_timer.Timer(i,maxitr)
+    48  114.402 MiB -145.742 MiB           for n in range(N):
+    49  114.402 MiB -139.480 MiB               I_D[:,n]=max_atoms(D_old,Y[:,n],S)
+    50  114.402 MiB   -2.773 MiB           D_new=np.zeros((M,K))
+    51  114.402 MiB -771.367 MiB           for k in range(K):
+    52  114.402 MiB -31466.789 MiB               for n in range(N):
+    53  114.402 MiB -30697.824 MiB                   matproj=proj(D_old[:,I_D[:,n]])@Y[:,n]
+    54  114.402 MiB -30699.609 MiB                   vecproj=proj(D_old[:,k])@Y[:,n]
+    55  114.402 MiB -30699.680 MiB                   signer=np.sign(D_old[:,k].T@Y[:,n])
+    56  114.402 MiB -30699.750 MiB                   indicator=np.any(I_D[:,n]==k)
+    57  114.402 MiB -30699.789 MiB                   D_new[:,k]=D_new[:,k]+(Y[:,n]-matproj+vecproj)*signer*indicator
+    58                                 #hugget fra Karin
+    59  114.344 MiB   -4.371 MiB           scale = np.sum(D_new*D_new, axis=0)
+    60  114.344 MiB   -2.727 MiB           iszero = np.where(scale < 0.00001)[0]
+    61  114.344 MiB   -2.730 MiB           D_new[:,iszero] = np.random.randn(M, len(iszero))
+    62                                 #end hugget
+    63                             
+    64  114.402 MiB   -2.172 MiB           D_new = normalize_mat_col(D_new)
+    65  114.402 MiB   -3.789 MiB           D_old = 1*D_new
+    66  114.168 MiB   -0.234 MiB       return D_old
+
+

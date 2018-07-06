@@ -1,0 +1,55 @@
+Timer unit: 2.77277e-07 s
+
+Total time: 6.37819 s
+File: gpu_itkrm_2.py
+Function: gpu_itkrm at line 20
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    20                                           @profile
+    21                                           def gpu_itkrm(data, K, S, maxit):
+    22         1         15.0     15.0      0.0      M, N = data.shape
+    23         1       5307.0   5307.0      0.0      D_init = np.random.randn(M, K)
+    24       201        843.0      4.2      0.0      for i in range(K):
+    25       200      16851.0     84.3      0.1          D_init[:,i] = D_init[:,i] / np.linalg.norm(D_init[:,i], 2)
+    26         1          3.0      3.0      0.0      Y = data
+    27         1        701.0    701.0      0.0      I_D = np.zeros((S, N), dtype=np.int32)
+    28         1          4.0      4.0      0.0      D = D_init
+    29         1          3.0      3.0      0.0      TpB = 32    # ThreadsPerBlock
+    30         1         18.0     18.0      0.0      BpG_N = math.ceil(N/32)     # BlocksPerGrid
+    31         1          5.0      5.0      0.0      BpG_M = math.ceil(M/32)
+    32                                           
+    33                                               # Move training data to device and allocate arrays on device.
+    34         1      19690.0  19690.0      0.1      d_Y = cuda.to_device(Y.reshape(-1)*1)
+    35         1      40358.0  40358.0      0.2      d_vecproj = cuda.device_array(shape=(N*M*S))
+    36         1       4025.0   4025.0      0.0      z = cuda.device_array(shape=(N*S))
+    37         1       1500.0   1500.0      0.0      x = cuda.device_array(shape=(N*S))
+    38         1       2421.0   2421.0      0.0      d_matproj = cuda.device_array(shape=(M*N))
+    39         1       1543.0   1543.0      0.0      d_signer = cuda.device_array(shape=(S*N))
+    40                                           
+    41        21        104.0      5.0      0.0      for t in range(maxit):
+    42        20       6637.0    331.9      0.0          N_timer.Timer(t, maxit)
+    43     80020     315831.0      3.9      1.4          for n in range(N):
+    44     80000    7857017.0     98.2     34.2              I_D[:,n] = np.argpartition(np.abs(D.T@Y[:,n]), -S)[-S:]
+    45        20       3647.0    182.3      0.0          D_new = np.zeros((M, K))
+    46        20      47490.0   2374.5      0.2          DtD = D.T@D
+    47                                           
+    48        20      55607.0   2780.3      0.2          d_D = cuda.to_device(D.reshape(-1)*1)
+    49        20      34892.0   1744.6      0.2          d_DtD = cuda.to_device(DtD.reshape(-1)*1)
+    50        20      44053.0   2202.7      0.2          d_I_D = cuda.to_device(I_D.reshape(-1)*1)
+    51        20      32629.0   1631.5      0.1          d_Dnew = cuda.to_device(D_new.reshape(-1)*1)
+    52                                           
+    53        20    4261751.0 213087.5     18.5          k_matvecproj[TpB, BpG_N](d_D, d_DtD, d_I_D, d_Y, d_vecproj, z, x, d_matproj, d_signer)
+    54                                                   
+    55        20    1144033.0  57201.7      5.0          k_updateD[TpB, BpG_M](d_Dnew, d_I_D, d_Y, d_vecproj, d_matproj, d_signer)
+    56        20    8782310.0 439115.5     38.2          D_new = d_Dnew.copy_to_host()
+    57        20        386.0     19.3      0.0          D_new = D_new.reshape(M, K)
+    58                                           
+    59        20       7473.0    373.6      0.0          scale = np.sum(D_new*D_new, axis=0)
+    60        20        903.0     45.1      0.0          iszero = np.where(scale < 0.00001)[0]
+    61        20       4193.0    209.7      0.0          D_new[:,iszero] = np.random.randn(M, len(iszero))
+    62                                           
+    63        20     309105.0  15455.2      1.3          D_new = normalize_mat_col(D_new)
+    64        20       1607.0     80.3      0.0          D = 1*D_new
+    65         1          4.0      4.0      0.0      return D
+

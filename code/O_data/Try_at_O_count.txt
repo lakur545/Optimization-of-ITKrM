@@ -1,0 +1,47 @@
+Timer unit: 4.10256e-07 s
+
+Total time: 59.7641 s
+File: C:\Users\Niels\Documents\GitHub\DLPC\code\first_implementation\Niels_ITKrM.py
+Function: itkrm at line 33
+
+Line #      					 Line Contents
+==============================================================
+    33                                           @profile
+    34                                           def itkrm(data,K,S,maxitr,startD=np.array([1])):
+    35                                           
+    36   O(1)                                       M, N = data.shape
+    37   O(1)                                       if startD.all()==1:
+    38   O(k)         		                         D_init = np.random.randn(M, K)
+    39   O(1)                                        else:
+    40   O(1)                                            D_init=startD
+    41   O(1)                                        Y = data
+    42   O(n)                                        I_D=np.zeros((S,N), dtype=np.int32)
+    43                                           
+    44                                               #Algorithm
+    45   O(1)                                        D_old=D_init
+    46   O(i)*one(                                   for i in range(maxitr):
+    47   debug                                           N_timer.Timer(i,maxitr)
+    48   O(n)*two(                                       for n in range(N):
+    49   O(n*log(n))                                         I_D[:,n]=max_atoms(D_old,Y[:,n],S)
+	            )two
+    50   O(k)                                            D_new=np.zeros((M,K))
+    51   O(k)*three(                                     for k in range(K):
+    52   O(n)*four(                                          for n in range(N):
+    53   O(m^3)	                                            	 matproj=proj(D_old[:,I_D[:,n]])@Y[:,n]
+    54   O(m^3)	                                            	 vecproj=proj(D_old[:,k])@Y[:,n]
+    55   O(m)		                                           	 signer=np.sign(D_old[:,k].T@Y[:,n])
+    56   O(n)	                                              	 indicator=np.any(I_D[:,n]==k)
+    57   O(1)	                                              	 D_new[:,k]=D_new[:,k]+(Y[:,n]-matproj+vecproj)*signer*indicator
+		)four
+			)three
+    58                                               #hugget fra Karin
+    59   O(m*k)                                          scale = np.sum(D_new*D_new, axis=0)
+    60   O(k) 	                                         iszero = np.where(scale < 0.00001)[0]
+    61   O(m) 	                                         D_new[:,iszero] = np.random.randn(M, len(iszero))
+    62                                               #end hugget
+    63                                           
+    64   O(k)*O(m)                                       D_new = normalize_mat_col(D_new)
+    65   O(1) 	                                         D_old = 1*D_new
+				)one
+    66   O(1)  	                                     return D_old
+

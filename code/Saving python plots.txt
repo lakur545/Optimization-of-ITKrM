@@ -1,0 +1,19 @@
+Dont touch the figure in anyway after showing it/doing the plot commands.
+Simply execute
+
+	plt.tight_layout()
+
+	plt.savefig('name.eps')
+
+Example of setting font sizes
+	plt.figure(4, dpi=200)
+	plt.plot(data, color='k', linewidth=2.5)
+	plt.xlabel('Sample', fontsize=16)
+	plt.ylabel('Amplitude', fontsize=16)
+	ax = plt.gca()
+	plt.setp(ax.get_xticklabels(), fontsize=14)
+	plt.setp(ax.get_yticklabels(), fontsize=14)
+	plt.ylim([-0.5, 0.1])
+	plt.xlim([0, 600])
+	plt.grid(which="major",ls="-", color='grey')
+	plt.tight_layout()

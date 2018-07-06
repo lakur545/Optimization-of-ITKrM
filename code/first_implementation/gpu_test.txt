@@ -1,0 +1,60 @@
+Timer unit: 1e-06 s
+
+Total time: 21.7741 s
+File: /home/niels/GitHub/DLPC/code/first_implementation/gpu_optimization/GPU_Niels_ITKrM_optimization.py
+Function: itkrm at line 27
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    27                                           @profile
+    28                                           def itkrm(data,K,S,maxitr,startD=np.array([1])):
+    29         1          3.0      3.0      0.0      M, N = data.shape
+    30         1         22.0     22.0      0.0      if startD.all()==1:
+    31         1       1815.0   1815.0      0.0          D_init = np.random.randn(M, K)
+    32                                               else:
+    33                                                   D_init = startD
+    34                                                   
+    35                                               #Algorithm    
+    36         1      12894.0  12894.0      0.1      GPU_D_old = cp.asarray(D_init)
+    37                                                  
+    38         1        186.0    186.0      0.0      GPU_Y = cp.asarray(data)
+    39                                               
+    40         1     121789.0 121789.0      0.6      GPU_M = int(cp.asarray(M))
+    41                                               
+    42         1        100.0    100.0      0.0      GPU_N = int(cp.asarray(N))
+    43                                               
+    44         1         64.0     64.0      0.0      GPU_S = int(cp.asarray(S))
+    45                                               
+    46         1         59.0     59.0      0.0      GPU_maxitr = int(cp.asarray(maxitr))
+    47                                               
+    48         1        219.0    219.0      0.0      GPU_I_D = cp.zeros((S,N),dtype=cp.int32)
+    49                                               
+    50        21         30.0      1.4      0.0      for i in range(GPU_maxitr):
+    51        20        121.0      6.0      0.0          start_time = N_timer.cont_timer(0,0)
+    52        20        604.0     30.2      0.0          N_timer.Timer(i,maxitr)
+    53      8020      10820.0      1.3      0.0          for n in range(GPU_N):
+    54      8000    2747605.0    343.5     12.6              GPU_I_D[:,n] = max_atoms(GPU_D_old,GPU_Y[:,n],GPU_S)
+    55                                           
+    56        20        460.0     23.0      0.0          GPU_D_new = cp.zeros((M,K))
+    57                                                   
+    58        20       2712.0    135.6      0.0          GPU_DtD = GPU_D_old.T @ GPU_D_old
+    59                                           
+    60      8020      11620.0      1.4      0.1          for n in range(GPU_N):
+    61      8000    1913756.0    239.2      8.8              GPU_DtY = GPU_D_old[:,GPU_I_D[:,n]].T @ GPU_Y[:,n]
+    62      8000    7726403.0    965.8     35.5              GPU_matproj = cp.repeat((GPU_D_old[:,GPU_I_D[:,n]] @ cp.linalg.inv(GPU_DtD[GPU_I_D[:,n,None], GPU_I_D[:,n]]) @ GPU_DtY)[:,None],GPU_S,axis=1)
+    63      8000    5799354.0    724.9     26.6              GPU_vecproj = GPU_D_old[:,GPU_I_D[:,n]] @ cp.diag(cp.diag( GPU_DtD[GPU_I_D[:,n,None], GPU_I_D[:,n]] )**-1*( GPU_DtY ))
+    64      8000     281662.0     35.2      1.3              GPU_signer = cp.sign( GPU_DtY )
+    65      8000    2515517.0    314.4     11.6              GPU_D_new[:,GPU_I_D[:,n]] = GPU_D_new[:,GPU_I_D[:,n]] + (cp.repeat(GPU_Y[:,n,None], S, axis=1) - GPU_matproj + GPU_vecproj)*GPU_signer
+    66                                                       
+    67                                                       
+    68                                           
+    69                                           
+    70        20       2590.0    129.5      0.0          GPU_scale = cp.sum(GPU_D_new*GPU_D_new, axis=0)
+    71        20       7071.0    353.6      0.0          GPU_iszero = cp.where(GPU_scale < 0.00001)[0]
+    72                                           #        GPU_D_new[:,GPU_iszero] = np.random.randn(GPU_M, len(GPU_iszero))  # generate random with GPU
+    73        20       8921.0    446.1      0.0          GPU_D_new[:,GPU_iszero] = cp.asarray(np.random.randn(M, len(GPU_iszero)))  # generate random with CPU
+    74                                               #end hugget
+    75        20     605683.0  30284.2      2.8          GPU_D_new = normalize_mat_col(GPU_D_new)
+    76        20       1783.0     89.2      0.0          GPU_D_old = 1*GPU_D_new
+    77         1        263.0    263.0      0.0      return cp.asnumpy(GPU_D_old)
+

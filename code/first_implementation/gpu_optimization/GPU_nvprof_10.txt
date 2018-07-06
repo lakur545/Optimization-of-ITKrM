@@ -1,0 +1,80 @@
+==2398== Profiling application: python combined_test.py
+==2398== Profiling result:
+            Type  Time(%)      Time     Calls       Avg       Min       Max  Name
+ GPU activities:   38.33%  235.29ms      2400  98.038us  51.264us  124.19us  void getf2_domino_kernel<double, double, int=256, int=7, bool=1>(int, int, double*, int, int*, int, int*, int*, double*, int*, double*)
+                   21.67%  133.01ms      4820  27.595us  5.4080us  442.75us  void gemm_kernel2x2_core<double, bool=0, bool=0, bool=0, bool=0, bool=0>(double*, double const *, double const *, int, int, int, int, int, int, double*, double*, double, double, int)
+                    5.67%  34.791ms       800  43.488us  43.328us  43.712us  void trsm_left_kernel<double, int=256, int=4, bool=0, bool=0, bool=0, bool=1, bool=0>(cublasTrsmParams<double>, double, double const *, int)
+                    4.80%  29.451ms     12044  2.4450us  1.0240us  15.840us  cupy_copy
+                    3.91%  24.005ms      4800  5.0010us  2.2720us  122.02us  cupy_take
+                    3.43%  21.077ms      4800  4.3900us  3.9360us  6.3360us  cupy_power
+                    3.32%  20.382ms       800  25.477us  24.832us  27.328us  void thrust::cuda_cub::cub::DeviceRadixSortSingleTileKernel<thrust::cuda_cub::cub::DeviceRadixSortPolicy<double, unsigned long, int>::Policy700, bool=0, double, unsigned long, int>(int const *, thrust::cuda_cub::cub::DeviceRadixSortSingleTileKernel<thrust::cuda_cub::cub::DeviceRadixSortPolicy<double, unsigned long, int>::Policy700, bool=0, double, unsigned long, int>*, thrust::cuda_cub::cub::DeviceRadixSortPolicy<double, unsigned long, int>::Policy700 const *, thrust::cuda_cub::cub::DeviceRadixSortSingleTileKernel<thrust::cuda_cub::cub::DeviceRadixSortPolicy<double, unsigned long, int>::Policy700, bool=0, double, unsigned long, int>**, bool=0, int, int)
+                    2.76%  16.971ms      4000  4.2420us  2.3360us  14.784us  void laswp_kernel2<double, bool=0>(int, double*, int, int, int, int const *, int)
+                    2.60%  15.956ms      5620  2.8390us  2.3360us  18.401us  cupy_sum
+                    2.10%  12.870ms      1600  8.0430us  4.3200us  13.088us  void trsm_left_kernel<double, int=256, int=4, bool=0, bool=0, bool=0, bool=0, bool=1>(cublasTrsmParams<double>, double, double const *, int)
+                    1.61%  9.9001ms       800  12.375us  12.288us  12.640us  void trsm_ln_kernel<double, unsigned int=32, unsigned int=32, unsigned int=4, bool=1>(int, int, double const *, int, double*, int, double, double const *, int, int*)
+                    1.52%  9.3431ms      4840  1.9300us  1.0240us  15.488us  cupy_multiply
+                    1.12%  6.8957ms      4000  1.7230us  1.6640us  10.400us  cupy_sqrt
+                    1.09%  6.7157ms      3200  2.0980us  1.4720us  16.128us  cupy_remainder
+                    1.01%  6.1937ms      4000  1.5480us  1.5040us  2.1120us  cupy_true_divide
+                    0.97%  5.9832ms       820  7.2960us  5.7600us  17.600us  cupy_scatter_update
+                    0.68%  4.1484ms      5641     735ns     480ns  15.040us  [CUDA memset]
+                    0.58%  3.5892ms       800  4.4860us  4.2560us  113.67us  void gemmSN_NN_kernel<double, double, double, int=128, int=2, int=4, int=8, int=4, int=4>(cublasGemmSmallNParams<double, double, double>, double const *, double const *, double, double, int)
+                    0.53%  3.2519ms      1600  2.0320us  1.7280us  14.880us  cupy_add
+                    0.34%  2.0657ms      1600  1.2910us  1.0880us  13.888us  copy_info_kernel(int, int*)
+                    0.32%  1.9480ms       800  2.4340us  2.0800us  10.048us  cupy_subtract
+                    0.22%  1.3682ms       800  1.7100us  1.5360us  9.7920us  cupy_sign
+                    0.21%  1.3021ms       800  1.6270us  1.5360us  7.5840us  getf2_init(int*)
+                    0.18%  1.1246ms       800  1.4050us  1.1520us  7.8080us  cupy_absolute
+                    0.18%  1.0968ms       800  1.3700us  1.3120us  13.920us  pivotOffset_kernel(int*, int, int)
+                    0.17%  1.0453ms       800  1.3060us  1.0880us  1.5360us  void thrust::cuda_cub::core::_kernel_agent<thrust::cuda_cub::__parallel_for::ParallelForAgent<thrust::cuda_cub::__transform::binary_transform_f<thrust::counting_iterator<unsigned long, thrust::use_default, thrust::use_default, thrust::use_default>, thrust::constant_iterator<long, thrust::use_default, thrust::use_default>, thrust::device_ptr<unsigned long>, thrust::cuda_cub::__transform::no_stencil_tag, thrust::modulus<unsigned long>, thrust::cuda_cub::__transform::always_true_predicate>, __int64>, thrust::cuda_cub::__transform::binary_transform_f<thrust::counting_iterator<unsigned long, thrust::use_default, thrust::use_default, thrust::use_default>, thrust::constant_iterator<long, thrust::use_default, thrust::use_default>, thrust::device_ptr<unsigned long>, thrust::cuda_cub::__transform::no_stencil_tag, thrust::modulus<unsigned long>, thrust::cuda_cub::__transform::always_true_predicate>, __int64>(thrust::use_default, thrust::use_default)
+                    0.16%  1.0003ms       800  1.2500us  1.1520us  6.5280us  dtrsv_init(int*)
+                    0.16%  983.59us       800  1.2290us  1.0880us  15.393us  void thrust::cuda_cub::core::_kernel_agent<thrust::cuda_cub::__parallel_for::ParallelForAgent<thrust::cuda_cub::__transform::unary_transform_f<double*, double*, thrust::cuda_cub::__transform::no_stencil_tag, thrust::identity<double>, thrust::cuda_cub::__transform::always_true_predicate>, long>, thrust::cuda_cub::__transform::unary_transform_f<double*, double*, thrust::cuda_cub::__transform::no_stencil_tag, thrust::identity<double>, thrust::cuda_cub::__transform::always_true_predicate>, long>(double*, thrust::cuda_cub::__transform::no_stencil_tag)
+                    0.16%  976.48us       800  1.2200us  1.0880us  9.5680us  void thrust::cuda_cub::core::_kernel_agent<thrust::cuda_cub::__parallel_for::ParallelForAgent<thrust::cuda_cub::__transform::unary_transform_f<unsigned long*, unsigned long*, thrust::cuda_cub::__transform::no_stencil_tag, thrust::identity<unsigned long>, thrust::cuda_cub::__transform::always_true_predicate>, long>, thrust::cuda_cub::__transform::unary_transform_f<unsigned long*, unsigned long*, thrust::cuda_cub::__transform::no_stencil_tag, thrust::identity<unsigned long>, thrust::cuda_cub::__transform::always_true_predicate>, long>(unsigned long*, thrust::cuda_cub::__transform::no_stencil_tag)
+                    0.11%  655.49us        47  13.946us     576ns  76.928us  [CUDA memcpy HtoD]
+                    0.04%  224.86us        20  11.243us  10.976us  11.392us  cupy_concatenate_same_size
+                    0.01%  83.873us        25  3.3540us     704ns  62.593us  [CUDA memcpy DtoH]
+                    0.01%  81.666us        20  4.0830us  3.9360us  4.2240us  inclusive_scan_kernel
+                    0.01%  35.264us        20  1.7630us  1.5680us  1.8560us  nonzero_1d_kernel
+                    0.01%  33.473us        20  1.6730us  1.5360us  1.7600us  cupy_less
+                    0.00%  29.952us        20  1.4970us  1.3760us  1.6000us  cupy_not_equal
+      API calls:   48.86%  1.29462s    161597  8.0110us     261ns  1.20423s  cudaGetDevice
+                   24.54%  650.12ms       815  797.69us     337ns  268.52ms  cudaFree
+                   15.45%  409.42ms     48224  8.4890us  6.1970us  399.00us  cuLaunchKernel
+                    5.13%  136.04ms     22420  6.0670us  3.9110us  327.33us  cudaLaunch
+                    1.62%  42.842ms      5641  7.5940us  4.8600us  49.179us  cudaMemsetAsync
+                    1.08%  28.504ms       827  34.466us  5.0120us  19.560ms  cudaMalloc
+                    0.78%  20.718ms    161880     127ns      93ns  388.19us  cudaSetupArgument
+                    0.39%  10.339ms        31  333.50us  150.65us  858.29us  cuModuleLoadData
+                    0.38%  9.9774ms      4000  2.4940us  2.0830us  21.168us  cudaFuncGetAttributes
+                    0.32%  8.5110ms      2400  3.5460us  2.2120us  25.316us  cudaStreamDestroy
+                    0.22%  5.9205ms      1600  3.7000us  1.4530us  43.698us  cudaStreamCreate
+                    0.19%  5.1170ms      6442     794ns     417ns  23.925us  cudaEventRecord
+                    0.17%  4.5931ms     22420     204ns     108ns  18.566us  cudaConfigureCall
+                    0.16%  4.2630ms      6400     666ns     460ns  18.557us  cudaStreamWaitEvent
+                    0.13%  3.5754ms     21620     165ns      89ns  305.65us  cudaGetLastError
+                    0.09%  2.2861ms      2522     906ns     411ns  17.766us  cudaEventCreateWithFlags
+                    0.07%  1.7385ms         4  434.61us  32.388us  603.44us  cudaHostAlloc
+                    0.07%  1.7279ms      2457     703ns     392ns  13.038us  cudaEventDestroy
+                    0.06%  1.5875ms       800  1.9840us  1.3250us  23.162us  cudaStreamCreateWithPriority
+                    0.06%  1.5667ms       881  1.7780us  1.2920us  7.3400us  cudaEventQuery
+                    0.05%  1.3282ms       367  3.6190us     118ns  169.55us  cuDeviceGetAttribute
+                    0.04%  1.0012ms      2476     404ns     233ns  18.406us  cudaDeviceGetAttribute
+                    0.03%  803.42us        30  26.780us  6.1980us  251.17us  cudaMemcpy
+                    0.03%  711.50us      5600     127ns      89ns     324ns  cudaPeekAtLastError
+                    0.02%  639.40us         1  639.40us  639.40us  639.40us  cudaGetDeviceProperties
+                    0.02%  512.15us        42  12.194us  10.135us  25.303us  cudaMemcpyAsync
+                    0.02%  487.08us       800     608ns     507ns  2.6820us  cudaDeviceGetStreamPriorityRange
+                    0.01%  228.92us         4  57.231us  47.845us  65.881us  cuDeviceTotalMem
+                    0.01%  165.19us         4  41.297us  35.477us  45.031us  cuDeviceGetName
+                    0.00%  92.257us         1  92.257us  92.257us  92.257us  cudaMemGetInfo
+                    0.00%  74.560us         3  24.853us  19.404us  34.792us  cudaStreamCreateWithFlags
+                    0.00%  36.505us        28  1.3030us     500ns  4.8720us  cudaSetDevice
+                    0.00%  26.761us        31     863ns     482ns  1.8600us  cuModuleGetFunction
+                    0.00%  6.5820us         2  3.2910us  2.0530us  4.5290us  cudaThreadSynchronize
+                    0.00%  3.3570us         3  1.1190us     881ns  1.4470us  cudaEventCreate
+                    0.00%  2.5750us         6     429ns     168ns  1.3280us  cuDeviceGetCount
+                    0.00%  1.5590us         5     311ns     178ns     783ns  cuDeviceGet
+                    0.00%  1.5310us         3     510ns     482ns     534ns  cuInit
+                    0.00%  1.3780us         3     459ns     370ns     627ns  cuDriverGetVersion
+                    0.00%     525ns         1     525ns     525ns     525ns  cudaRuntimeGetVersion
+

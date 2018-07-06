@@ -1,0 +1,38 @@
+np.random.seed(0)
+
+K = 200         # Number of columns in D (Atoms)
+S = 4         # Number of used vectors (Sparsity). Amount that is NOT zero.
+maxit = 20
+N = 1024        #Length of training examples, length of Y
+e_or_S = 1      # for error = 0, for S = 1
+
+pic_number = 0
+
+#data = np.load('grayScale32x32cars.npy')
+
+data = LoadFromDataBatch.ImportData(7, 1)
+    # Parameters:
+    #     picType: Positive integer between [0:10]. -1 returns all pictures.
+    #     batchNumber: Positive integer between [1:5]
+
+data=data[:20,:]  # A reduction in the set size, to test less optimal ITKrM routines without waiting hours
+
+W_data = 32    # Width in pixels
+H_data = 32    # Height in pixels
+
+e = 30
+
+32x32 windows test, 14/03
+[55423, 54877, 48042, 49694, 46901, 45621, 52725, 54413, 55685, 71953, 50314, 50755, 50068, 52789, 53114, 49237, 49429, 48122, 51101, 49202]
+16x16 windows test, 14/03
+[4993, 4755, 4753, 4889, 5100, 5655, 6425, 5940, 4963, 5412, 5339, 5556, 5045, 5229, 5103, 5296, 5045, 4967, 5064, 4944]
+8x8 windows test, 14/03
+[8377, 8198, 8289, 8145, 8145, 8220, 8234, 8236, 8284, 8162, 8214, 8190, 8285, 8231, 8261, 9158, 9092, 9265, 9554, 9691]
+4x4 windows test, 14/03
+[37374, 36997, 38981, 39370, 32898, 29338, 29415, 29506, 32818, 36450, 36730, 36871, 33553, 35409, 34866, 35151, 35180, 35132, 33508, 32831]
+2x2 windows test, 14/03
+[119202, 118310, 118248, 138143, 123992, 127031, 139821, 127317, 113400, 143272, 136505, 122951, 133980, 120299, 122385, 121816, 119073, 126696, 132446, 129690]
+1x1 data test, 14/03
+[341943, 335831, 343651, 336283, 342388, 344037, 343024, 339281, 340104, 336828, 339090, 339253, 338222, 337897, 343649, 337953, 338948, 340054, 338630, 338223]
+64x64 data test, 15/03
+[236652, 223082, 221061, 224397, 221616, 227679]

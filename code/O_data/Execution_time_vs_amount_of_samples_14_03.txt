@@ -1,0 +1,39 @@
+np.random.seed(0)
+
+K = 200         # Number of columns in D (Atoms)
+S = 4         # Number of used vectors (Sparsity). Amount that is NOT zero.
+maxit = 20
+N = 1024        #Length of training examples, length of Y
+e_or_S = 1      # for error = 0, for S = 1
+
+pic_number = 0
+
+#data = np.load('grayScale32x32cars.npy')
+
+data = LoadFromDataBatch.ImportData(7, 1)
+    # Parameters:
+    #     picType: Positive integer between [0:10]. -1 returns all pictures.
+    #     batchNumber: Positive integer between [1:5]
+
+W_data = 32    # Width in pixels
+H_data = 32    # Height in pixels
+N_subpic = 16     # Width/Height in pixels of smaller square extracted from image.
+
+e = 30
+
+10 data test, 14/03
+[2455, 2394, 2328, 2359, 2343, 2372, 2347, 2375, 2356, 2343, 2362, 2359, 2359, 2390, 2375, 2328, 2359, 2422, 2424, 2343]
+20 data test, 14/03
+[4843, 4736, 4697, 4959, 5777, 6286, 5831, 5888, 5203, 5063, 5084, 5808, 5285, 7063, 5609, 5721, 5685, 4687, 4719, 4638]
+40 data test, 14/03
+[10016, 10086, 14296, 10943, 9358, 9938, 10696, 9285, 10261, 10200, 10108, 10103, 11808, 11854, 10391, 9771, 9613, 10110, 9676, 9747]
+80 data test, 14/03
+[20334, 19957, 18775, 20048, 19760, 20143, 18987, 18766, 25878, 20630]
+160 data test, 14/03
+[36503, 34365, 37549, 46197, 36122, 35761, 34446, 35714, 35692, 35689, 34370, 34144, 35320, 34763, 34421, 33978, 35270, 35280, 34215, 35707]
+320 data test, 14/03
+[71128, 72296, 72378, 71534, 70927, 71811, 72006, 71637, 71942, 72195, 71901, 71875, 74875, 89160, 102063, 76443, 76522, 77227, 77663, 70611]
+640 data test, 14/03
+[162913, 166917, 154278, 148997, 150407, 152973, 173496, 158094, 156321, 156901]
+20 data test, 14/03
+[298522, 273215, 269974]

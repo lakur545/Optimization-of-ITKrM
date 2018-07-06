@@ -1,0 +1,71 @@
+Setup used for the test
+###
+np.random.seed(0)
+
+K = 200         # Number of columns in D (Atoms)
+S = 4           # Number of used vectors (Sparsity). Amount that is NOT zero.
+maxit = 20
+N = 1024        #Length of training examples, length of Y
+
+pic_number = 0
+
+#data = np.load('grayScale32x32cars.npy')
+
+data = LoadFromDataBatch.ImportData(7, 1)
+    # Parameters:
+    #     picType: Positive integer between [0:10]. -1 returns all pictures.
+    #     batchNumber: Positive integer between [1:5]
+
+data=data[:10,:]  # A reduction in the set size, to test less optimal ITKrM routines without waiting hours
+
+W_data = 32    # Width in pixels
+H_data = 32    # Height in pixels
+N_subpic = 8     # Width/Height in pixels of smaller square extracted from image.
+
+e = 30
+###
+
+
+Total time: 125.77 s
+File: DLPC\code\first_implementation\Niels_ITKrM.py
+Function: itkrm at line 47
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    47                                           #@profile
+    48                                           def itkrm(data,K,S,maxitr):
+    49         1            9      9.0      0.0      M, N = data.shape
+    50         1          876    876.0      0.0      D_init = np.random.randn(M, K)
+    51         1            2      2.0      0.0      Y = data
+    52         1           13     13.0      0.0      I_D=np.zeros((S,N), dtype=np.int32)
+    53
+    54                                               #Algorithm
+    55         1            1      1.0      0.0      D_old=D_init
+    56        21           75      3.6      0.0      for i in range(maxitr):
+    57        20          464     23.2      0.0          if i<2:Timer(maxitr)
+    58        20         9444    472.2      0.0          print('Iteration: {}'.format(i+1))
+    59      3220         7268      2.3      0.0          for n in range(N):
+    60      3200       177873     55.6      0.1              I_D[:,n]=max_atoms(D_old,Y[:,n],S)
+    61        20          850     42.5      0.0          D_new=np.zeros((M,K))
+    62      4020         6874      1.7      0.0          for k in range(K):
+    63                                           #            print(k)
+    64    644000      1424311      2.2      0.5              for n in range(N):
+    65    640000    144654739    226.0     47.2                  matproj=proj(D_old[:,I_D[:,n]])@Y[:,n]
+    66    640000    112369805    175.6     36.7                  vecproj=proj(D_old[:,k])@Y[:,n]
+    67    640000     10488800     16.4      3.4                  signer=np.sign(Y[:,n].T@Y[:,n])
+    68    640000     18380467     28.7      6.0                  indicator=np.any(I_D[:,n]==k)
+    69                                               #            print(matproj)
+    70                                               #            print(vecproj)
+    71                                               #            print(signer)
+    72                                               #            print(indicator)
+    73    640000     18875883     29.5      6.2                  D_new[:,k]=D_new[:,k]+(Y[:,n]-matproj+vecproj)*signer*indicator
+    74                                               #            print(D_new[:,k])
+    75
+    76                                               #hugget fra Karin
+    77        20         1776     88.8      0.0          scale = np.sum(D_new*D_new, axis=0)
+    78        20          363     18.1      0.0          iszero = np.where(scale < 0.00001)[0]
+    79        20        14461    723.0      0.0          D_new[:,iszero] = np.random.randn(M, len(iszero))
+    80                                               #end hugget
+    81
+    82        20       149930   7496.5      0.0          D_old=normalize_mat_col(D_new)
+    83         1            2      2.0      0.0      return D_old

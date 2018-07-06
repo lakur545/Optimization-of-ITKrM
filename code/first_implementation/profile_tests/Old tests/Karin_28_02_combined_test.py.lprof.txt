@@ -1,0 +1,62 @@
+Setup used for the test
+###
+np.random.seed(0)
+
+K = 200         # Number of columns in D (Atoms)
+S = 4           # Number of used vectors (Sparsity). Amount that is NOT zero.
+maxit = 20
+N = 1024        #Length of training examples, length of Y
+
+pic_number = 0
+
+#data = np.load('grayScale32x32cars.npy')
+
+data = LoadFromDataBatch.ImportData(7, 1)
+    # Parameters:
+    #     picType: Positive integer between [0:10]. -1 returns all pictures.
+    #     batchNumber: Positive integer between [1:5]
+
+data=data[:10,:]  # A reduction in the set size, to test less optimal ITKrM routines without waiting hours
+
+W_data = 32    # Width in pixels
+H_data = 32    # Height in pixels
+N_subpic = 8     # Width/Height in pixels of smaller square extracted from image.
+
+e = 30
+###
+
+
+Total time: 0.497638 s
+File: DLPC\code\first_implementation\KarinSchnassCopy.py
+Function: itkrm at line 24
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    24                                           @profile
+    25                                           def itkrm(data,K,S,maxit):
+    26         1           10     10.0      0.0      M, N = data.shape
+    27         1         1003   1003.0      0.1      D_init = np.random.randn(M, K)
+    28         1            2      2.0      0.0      Y = data
+    29
+    30                                               ### Algorithm
+    31         1            2      2.0      0.0      D = D_init
+    32        21           51      2.4      0.0      for t in range(maxit):
+    33        20          284     14.2      0.0          if t<2:Timer(maxit)
+    34        20         4507    225.3      0.4          print('Iteration: {}'.format(t+1))
+    35        20        27454   1372.7      2.3          ip = D.T@Y
+    36        20         2553    127.7      0.2          absip = np.abs(ip)
+    37        20         3941    197.1      0.3          signip = np.sign(ip)
+    38        20        21170   1058.5      1.7          I = np.argpartition(absip, -S, axis=0)[-S:]
+    39        20         7730    386.5      0.6          gram = D.T@D
+    40        20         1041     52.0      0.1          Dnew = np.zeros((M, K))
+    41      3220         8468      2.6      0.7          for n in range(N):
+    42      3200       716130    223.8     59.0              res = Y[:,n]-D[:,I[:,n]]@np.linalg.pinv(gram[I[:,n].reshape(S,1),I[:,n]])@ip[I[:,n],n]
+    43      3200       182542     57.0     15.0              Dnew[:,I[:,n]] = Dnew[:,I[:,n]] + np.real(np.outer(res, signip[I[:,n],n]))
+    44      3200       208081     65.0     17.2              Dnew[:,I[:,n]] = Dnew[:,I[:,n]] + D[:,I[:,n]]@np.diag(absip[I[:,n],n])
+    45        20         2216    110.8      0.2          scale = np.sum(Dnew*Dnew, axis=0)
+    46        20          622     31.1      0.1          iszero = np.where(scale < 0.00001)[0]
+    47        20        15145    757.2      1.2          Dnew[:,iszero] = np.random.randn(M, len(iszero))
+    48        20         3140    157.0      0.3          scale[iszero] = np.sum(Dnew[:,iszero]*Dnew[:,iszero], axis=0)
+    49        20         6822    341.1      0.6          Dnew = Dnew@np.diag(1/np.sqrt(scale))
+    50        20           77      3.9      0.0          D = Dnew
+    51         1            2      2.0      0.0      return Dnew
